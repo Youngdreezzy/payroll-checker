@@ -21,3 +21,5 @@ h2{font-size:.95rem;margin:18px 0 4px;color:var(--accent)}
 .row span:last-child{font-variant-numeric:tabular-nums;text-align:right}
 .who{color:var(--mute);margin:0}
 .who strong{color:var(--ink)}
+footer{text-align:center;color:var(--muted);font-size:.9rem;margin-top:28px}
+footer a{color:var(--accent);font-weight:600}
