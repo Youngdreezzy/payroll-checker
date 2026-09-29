@@ -23,3 +23,22 @@ h2{font-size:.95rem;margin:18px 0 4px;color:var(--accent)}
 .who strong{color:var(--ink)}
 footer{text-align:center;color:var(--muted);font-size:.9rem;margin-top:28px}
 footer a{color:var(--accent);font-weight:600}
+
+.company{
+  text-align:center;
+  padding:18px 16px;
+  margin-bottom:22px;
+  border-bottom:3px solid var(--accent);
+}
+.company h1{
+  font-size:1.7rem;
+  line-height:1.2;
+  letter-spacing:.02em;
+  margin:0 0 6px;
+  color:var(--accent);
+}
+.company p{
+  margin:0;
+  color:var(--muted);
+  font-size:.95rem;
+}
