@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Upload payroll</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head><body><main>
+<h1>Upload monthly payroll</h1>
+<p class="sub">Choose the month, select the Excel file, then publish. Re-uploading a month replaces it.</p>
+<div class="card">
+  <label for="pw">Admin password</label><input id="pw" type="password" autocomplete="current-password">
+  <label for="month">Payroll month</label><input id="month" type="month">
+  <label for="file">Excel file (.xlsx, .xls)</label><input id="file" type="file" accept=".xlsx,.xls">
+  <div id="preview" class="msg"></div>
+  <button id="go" disabled>Publish payroll</button>
+  <div id="msg" class="msg" role="status"></div>
+</div>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const norm = s => String(s).trim().toLowerCase().replace(/\s+/g, ' ');
+// Header text → field name. "Absent" appears twice: 1st = attendance days, 2nd = deduction.
+const MAP = [[/^names?$/,'name'],[/^designation/,'dept'],[/^bank/,'bank'],[/^a\/?c/,'acct'],[/^arrears/,'arrears'],
+  [/^monthly pay/,'monthlyPay'],[/^working day/,'workingDays'],[/^present/,'present'],[/^amount payable/,'amountPayable'],
+  [/^paye/,'paye'],[/^fine/,'fine'],[/^monday meeting/,'mondayMeeting'],[/^lateness/,'lateness'],[/^debt/,'debt'],[/^net pay/,'netPay']];
+const TEXT = ['name','dept','bank','acct'];
+let rows = [];
+
+$('month').value = new Date().toISOString().slice(0, 7);
+$('file').onchange = async e => {
+  rows = []; $('go').disabled = true; $('preview').className = 'msg';
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const wb = XLSX.read(await f.arrayBuffer());
+    const aoa = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '' });
+    const hi = aoa.findIndex(r => r.some(c => /^a\/?c\s*n/.test(norm(c))));
+    if (hi < 0) throw new Error('Could not find the "A/C N0" column header.');
+    let absents = 0;
+    const cols = aoa[hi].map(h => {
+      const n = norm(h);
+      if (n === 'absent') return ++absents === 1 ? 'absentDays' : 'absentDeduction';
+      const m = MAP.find(([re]) => re.test(n)); return m ? m[1] : null;
+    });
+    const missing = ['name','acct','netPay'].filter(k => !cols.includes(k));
+    if (missing.length) throw new Error('Missing columns: ' + missing.join(', '));
+    for (const line of aoa.slice(hi + 1)) {
+      const o = {};
+      cols.forEach((k, i) => { if (k) o[k] = TEXT.includes(k) ? String(line[i]).trim() : (parseFloat(String(line[i]).replace(/[₦,\s]/g, '')) || 0); });
+      let a = (o.acct || '').replace(/\D/g, '');
+      if (a.length >= 6 && a.length < 10) a = a.padStart(10, '0'); // Excel drops leading zeros
+      if (a.length === 10) { o.acct = a; rows.push(o); }
+    }
+    if (!rows.length) throw new Error('No rows with a valid 10-digit account number were found.');
+    $('preview').textContent = `${rows.length} staff records ready. First: ${rows[0].name}.`;
+    $('go').disabled = false;
+  } catch (err) { $('preview').textContent = err.message; $('preview').classList.add('err'); }
+};
+
+$('go').onclick = async () => {
+  $('go').disabled = true; $('msg').className = 'msg'; $('msg').textContent = 'Publishing…';
+  try {
+    const r = await fetch('/api/upload', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-password': $('pw').value },
+      body: JSON.stringify({ month: $('month').value, rows }) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Upload failed.');
+    $('msg').textContent = `Published ${d.saved} records for ${d.month}.`; $('msg').classList.add('ok');
+  } catch (e) { $('msg').textContent = e.message; $('msg').classList.add('err'); }
+  $('go').disabled = false;
+};
+</script></body></html>

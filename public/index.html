@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Check my salary</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head><body><main>
+<h1>Check my salary</h1>
+<p class="sub">Enter your bank account number to see your pay breakdown.</p>
+<div class="card">
+  <label for="acct">Account number</label>
+  <input id="acct" inputmode="numeric" maxlength="10" placeholder="10-digit account number" autocomplete="off">
+  <button id="go">View my pay</button>
+  <div id="msg" class="msg" role="status"></div>
+</div>
+<div id="out"></div>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const naira = n => '₦' + Number(n || 0).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const monthName = m => new Date(m + '-01').toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+let records = {};
+
+$('go').onclick = lookup;
+$('acct').addEventListener('keydown', e => e.key === 'Enter' && lookup());
+
+async function lookup() {
+  const acct = $('acct').value.replace(/\D/g, '');
+  $('out').innerHTML = ''; $('msg').className = 'msg';
+  if (acct.length !== 10) { $('msg').textContent = 'Enter a 10-digit account number.'; $('msg').classList.add('err'); return; }
+  $('go').disabled = true; $('msg').textContent = 'Looking up…';
+  try {
+    const r = await fetch('/api/check?acct=' + acct);
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Something went wrong.');
+    records = d.records; $('msg').textContent = '';
+    render(Object.keys(records).sort().reverse());
+  } catch (e) { $('msg').textContent = e.message; $('msg').classList.add('err'); }
+  $('go').disabled = false;
+}
+
+function render(months, chosen = months[0]) {
+  const p = records[chosen];
+  const row = (k, v) => `<div class="row"><span>${k}</span><span>${v}</span></div>`;
+  $('out').innerHTML = `<div class="card">
+    ${months.length > 1 ? `<label for="mon">Month</label><select id="mon">${months.map(m => `<option value="${m}" ${m === chosen ? 'selected' : ''}>${monthName(m)}</option>`).join('')}</select>` : ''}
+    <p class="who" style="margin-top:14px"><strong>${esc(p.name)}</strong><br>${esc(p.dept)} · ${esc(p.bank)}</p>
+    <div class="net" style="margin-top:14px"><small>Net pay, ${monthName(chosen)}</small><b>${naira(p.netPay)}</b></div>
+    <h2>Earnings</h2>
+    ${row('Monthly pay', naira(p.monthlyPay))}${row('Arrears', naira(p.arrears))}${row('Amount payable', naira(p.amountPayable))}
+    <h2>Attendance</h2>
+    ${row('Working days', p.workingDays)}${row('Present at work', p.present)}${row('Absent', p.absentDays)}
+    <h2>Deductions</h2>
+    ${row('PAYE', naira(p.paye))}${row('Fine', naira(p.fine))}${row('Monday meeting', naira(p.mondayMeeting))}${row('Absent', naira(p.absentDeduction))}${row('Lateness', naira(p.lateness))}${row('Debt', naira(p.debt))}
+  </div>`;
+  const s = $('mon'); if (s) s.onchange = () => render(months, s.value);
+}
+</script></body></html>
