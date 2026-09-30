@@ -1,5 +1,5 @@
 :root{--bg:#eef2f1;--card:#fff;--ink:#14262b;--mute:#5d7075;--line:#d5dedd;--accent:#0f766e;--bad:#b42318;--good:#067647}
-@media(prefers-color-scheme:dark){:root{--bg:#5d7075;--card:#15262a;--ink:#e8f0ef;--mute:#8fa5a9;--line:#274045;--accent:#3fc3b5;--bad:#f97066;--good:#47cd89}}
+@media(prefers-color-scheme:dark){:root{--bg:#0e1a1d;--card:#15262a;--ink:#e8f0ef;--mute:#8fa5a9;--line:#274045;--accent:#3fc3b5;--bad:#f97066;--good:#47cd89}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Instrument Sans",system-ui,sans-serif;padding:24px 16px 48px}
 main{max-width:520px;margin:0 auto}
