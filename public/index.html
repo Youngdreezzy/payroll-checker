@@ -59,7 +59,7 @@ function render(months, chosen = months[0]) {
     <h2>Attendance</h2>
     ${row('Working days', p.workingDays)}${row('Present at work', p.present)}${row('Absent', p.absentDays)}
     <h2>Deductions</h2>
-    ${row('PAYE', naira(p.paye))}${row('Fine', naira(p.fine))}${row('Monday meeting', naira(p.mondayMeeting))}${row('Absent', naira(p.absentDeduction))}${row('Lateness', naira(p.lateness))}${row('Debt', naira(p.debt))}
+    ${row('PAYE', naira(p.paye))}${row('Fine', naira(p.fine))}${row('Monday meeting', naira(p.mondayMeeting))}${row('Devotion', naira(p.devotion))}${row('Absent', naira(p.absentDeduction))}${row('Lateness', naira(p.lateness))}${row('Debt', naira(p.debt))}
   </div>`;
   const s = $('mon'); if (s) s.onchange = () => render(months, s.value);
 }

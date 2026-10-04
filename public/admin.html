@@ -24,7 +24,7 @@ const norm = s => String(s).trim().toLowerCase().replace(/\s+/g, ' ');
 // Header text → field name. "Absent" appears twice: 1st = attendance days, 2nd = deduction.
 const MAP = [[/^names?$/,'name'],[/^designation/,'dept'],[/^bank/,'bank'],[/^a\/?c/,'acct'],[/^arrears/,'arrears'],
   [/^monthly pay/,'monthlyPay'],[/^working day/,'workingDays'],[/^present/,'present'],[/^amount payable/,'amountPayable'],
-  [/^paye/,'paye'],[/^fine/,'fine'],[/^monday meeting/,'mondayMeeting'],[/^lateness/,'lateness'],[/^debt/,'debt'],[/^net pay/,'netPay']];
+  [/^paye/,'paye'],[/^fine/,'fine'],[/^monday meeting/,'mondayMeeting'],[/^devotion/,'devotion'],[/^lateness/,'lateness'],[/^debt/,'debt'],[/^net pay/,'netPay']];
 const TEXT = ['name','dept','bank','acct'];
 let rows = [];
 
