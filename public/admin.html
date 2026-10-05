@@ -25,7 +25,7 @@ const norm = s => String(s).replace(/[\u200B-\u200D\uFEFF\u00A0]/g, ' ').trim().
 // Header text → field name. "Absent" appears twice: 1st = attendance days, 2nd = deduction.
 const MAP = [[/^names?$/,'name'],[/^designation/,'dept'],[/^bank/,'bank'],[/^a\/?c/,'acct'],[/^arrears/,'arrears'],
   [/^monthly pay/,'monthlyPay'],[/^working day/,'workingDays'],[/^present/,'present'],[/^amount payable/,'amountPayable'],
-  [/^paye/,'paye'],[/^fine/,'fine'],[/^monday meeting/,'mondayMeeting'],[/^Devotion/,'Devotion'],[/^lateness/,'lateness'],[/^debt/,'debt'],[/^net pay/,'netPay']];
+  [/^paye/,'paye'],[/^fine/,'fine'],[/^monday meeting/,'mondayMeeting'],[/devo/,'devotion'],[/^lateness/,'lateness'],[/^debt/,'debt'],[/^net pay/,'netPay']];
 const TEXT = ['name','dept','bank','acct'];
 let rows = [];
 
@@ -55,8 +55,10 @@ $('file').onchange = async e => {
     }
     if (!rows.length) throw new Error('No rows with a valid 10-digit account number were found.');
     const dev = cols.includes('devotion');
+    const unknown = aoa[hi].filter((h, i) => String(h).trim() && !cols[i] ).map(h => `"${String(h).trim()}"`);
     $('preview').textContent = `${rows.length} staff records ready. First: ${rows[0].name}. ` +
-      (dev ? `Devotion column found (first worker: ${rows[0].devotion}).` : 'Devotion column NOT found. Check the header in your Excel file.');
+      (dev ? `Devotion found (first worker: ${rows[0].devotion}).` : 'Devotion NOT found.') +
+      (unknown.length ? ` Unrecognised headers: ${unknown.join(', ')}` : '');
     $('go').disabled = false;
   } catch (err) { $('preview').textContent = err.message; $('preview').classList.add('err'); }
 };
