@@ -20,7 +20,8 @@
 </main>
 <script>
 const $ = id => document.getElementById(id);
-const norm = s => String(s).trim().toLowerCase().replace(/\s+/g, ' ');
+// const norm = s => String(s).trim().toLowerCase().replace(/\s+/g, ' ');
+const norm = s => String(s).replace(/[\u200B-\u200D\uFEFF\u00A0]/g, ' ').trim().toLowerCase().replace(/\s+/g, ' ');
 // Header text → field name. "Absent" appears twice: 1st = attendance days, 2nd = deduction.
 const MAP = [[/^names?$/,'name'],[/^designation/,'dept'],[/^bank/,'bank'],[/^a\/?c/,'acct'],[/^arrears/,'arrears'],
   [/^monthly pay/,'monthlyPay'],[/^working day/,'workingDays'],[/^present/,'present'],[/^amount payable/,'amountPayable'],
