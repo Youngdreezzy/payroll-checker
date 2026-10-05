@@ -24,7 +24,7 @@ const norm = s => String(s).trim().toLowerCase().replace(/\s+/g, ' ');
 // Header text → field name. "Absent" appears twice: 1st = attendance days, 2nd = deduction.
 const MAP = [[/^names?$/,'name'],[/^designation/,'dept'],[/^bank/,'bank'],[/^a\/?c/,'acct'],[/^arrears/,'arrears'],
   [/^monthly pay/,'monthlyPay'],[/^working day/,'workingDays'],[/^present/,'present'],[/^amount payable/,'amountPayable'],
-  [/^paye/,'paye'],[/^fine/,'fine'],[/^monday meeting/,'mondayMeeting'],[/^devotion/,'devotion'],[/^lateness/,'lateness'],[/^debt/,'debt'],[/^net pay/,'netPay']];
+  [/^paye/,'paye'],[/^fine/,'fine'],[/^monday meeting/,'mondayMeeting'],[/^Devotion/,'Devotion'],[/^lateness/,'lateness'],[/^debt/,'debt'],[/^net pay/,'netPay']];
 const TEXT = ['name','dept','bank','acct'];
 let rows = [];
 
@@ -53,7 +53,9 @@ $('file').onchange = async e => {
       if (a.length === 10) { o.acct = a; rows.push(o); }
     }
     if (!rows.length) throw new Error('No rows with a valid 10-digit account number were found.');
-    $('preview').textContent = `${rows.length} staff records ready. First: ${rows[0].name}.`;
+    const dev = cols.includes('devotion');
+    $('preview').textContent = `${rows.length} staff records ready. First: ${rows[0].name}. ` +
+      (dev ? `Devotion column found (first worker: ${rows[0].devotion}).` : 'Devotion column NOT found. Check the header in your Excel file.');
     $('go').disabled = false;
   } catch (err) { $('preview').textContent = err.message; $('preview').classList.add('err'); }
 };
