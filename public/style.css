@@ -42,3 +42,29 @@ footer a{color:var(--accent);font-weight:600}
   color:var(--muted);
   font-size:.95rem;
 }
+
+
+.ticker{
+  overflow:hidden;
+  white-space:nowrap;
+  background:#c62828;
+  color:#fff;
+  border-radius:8px;
+  padding:10px 0;
+  margin-top:14px;
+}
+.ticker .track{
+  display:inline-block;
+  animation:slide 28s linear infinite;
+}
+.ticker span{display:inline-block;padding-right:4rem}
+.ticker:hover .track{animation-play-state:paused}
+@keyframes slide{
+  from{transform:translateX(0)}
+  to{transform:translateX(-50%)}
+}
+@media (prefers-reduced-motion:reduce){
+  .ticker{white-space:normal;padding:10px 14px}
+  .ticker .track{animation:none}
+  .ticker span+span{display:none}
+}
