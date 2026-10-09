@@ -51,7 +51,7 @@ async function lookup() {
 function render(months, chosen = months[0]) {
   const p = records[chosen];
   const monthLabel = new Date(chosen + '-01').toLocaleDateString('en-GB', { month: 'long' });
-  const note = `You've checked your ${monthLabel} salary. Try to work diligently this month to avoid penalties like fine, lateness and devotions. Debt is still a bit normal.`;
+  const note = `You've checked your ${monthLabel} salary. Try to work diligently this month to avoid penalties like fine, lateness and devotions. Debt is still a bit normal. Enjoy!!!`;
   const row = (k, v) => `<div class="row"><span>${k}</span><span>${v}</span></div>`;
   $('out').innerHTML = `<div class="card">
     ${months.length > 1 ? `<label for="mon">Month</label><select id="mon">${months.map(m => `<option value="${m}" ${m === chosen ? 'selected' : ''}>${monthName(m)}</option>`).join('')}</select>` : ''}
